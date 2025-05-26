@@ -23,3 +23,6 @@ class Magazine:
         if hasattr(self, '_name') and self._name is not None:
             raise AttributeError("Name cannot be changed after instantiation.")
         self._name = value
+@property
+def category(self):
+        return self._category
