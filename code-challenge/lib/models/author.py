@@ -10,7 +10,19 @@ class Author:
         @property
         def name(self):
             return self._name
-           
+        
+
+        @name.setter
+        def name(self, value):
+         if not isinstance(value, str):
+            raise TypeError("Name must be a string.")
+         if len(value.strip()) == 0:
+            raise ValueError("Name must not be empty.")
+        if hasattr(self, '_name') and self._name is not None:
+            raise AttributeError("Name cannot be changed after instantiation.")
+            self._name = value
+
+       
         
 
 
