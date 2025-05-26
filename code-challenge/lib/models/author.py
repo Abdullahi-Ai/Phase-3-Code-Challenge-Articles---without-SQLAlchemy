@@ -34,6 +34,13 @@ class Author:
             authors_data = cursor.fetchall()
             return [cls(id=row[0], name=row[1]) for row in authors_data]
         
+             
+            def articles(self, cursor):
+              """Get all articles for this author."""
+              cursor.execute("SELECT * FROM articles WHERE author_id = ?", (self._id,))
+            return cursor.fetchall()
+
+        
 
 
 
