@@ -30,3 +30,31 @@ def setup_db(cursor):
         FOREIGN KEY(magazine_id) REFERENCES magazines(id)
     )
     """)
+
+def test_author():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+
+    setup_db(cursor)
+
+    author = Author(name="Osman")
+    author.create_author(cursor)
+    conn.commit()
+
+    print(f"Created author with id={author.id} and name={author.name}")
+
+    authors = Author.get_all_authors(cursor)
+    print("Authors in DB:")
+    for a in authors:
+        print(f"id={a.id}, name={a.name}")
+
+    articles = author.articles(cursor)
+    print("Articles for author:", articles)
+
+    magazines = author.magazines(cursor)
+    print("Magazines for author:", magazines)
+
+    conn.close()
+
+if __name__ == "__main__":
+    test_author()
