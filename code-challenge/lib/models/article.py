@@ -28,4 +28,11 @@ class Author:
     def create_magazine(self, cursor):
         cursor.execute("INSERT INTO magazines (name, category) VALUES (?, ?)", (self._name, self._category))
         self._id = cursor.lastrowid
-        
+
+    @classmethod
+    def get_all_authors(cls, cursor):
+        """Fetch all authors from the database."""
+        cursor.execute("SELECT * FROM authors")
+        authors_data = cursor.fetchall()
+        return [cls(id=row[0], name=row[1]) for row in authors_data]
+
