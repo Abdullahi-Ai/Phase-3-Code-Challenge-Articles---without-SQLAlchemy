@@ -41,4 +41,10 @@ class Magazine:
     def create_magazine(self, cursor):
         cursor.execute("INSERT INTO magazines (name, category) VALUES (?, ?)", (self._name, self._category))
         self._id = cursor.lastrowid
+
+    @classmethod
+    def get_all_magazines(cls, cursor):
+        cursor.execute("SELECT * FROM magazines")
+        magazines_data = cursor.fetchall()
+        return [cls(id=row[0], name=row[1], category=row[2]) for row in magazines_data]
  
