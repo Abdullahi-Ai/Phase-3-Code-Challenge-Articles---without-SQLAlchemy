@@ -27,6 +27,15 @@ class Author:
              cursor.execute("INSERT INTO authors (name) VALUES (?)", (self._name,))
             self._id = cursor.lastrowid
 
+            @classmethod
+            def get_all_authors(cls, cursor):
+             """Fetch all authors from the database."""
+            cursor.execute("SELECT * FROM authors")
+            authors_data = cursor.fetchall()
+            return [cls(id=row[0], name=row[1]) for row in authors_data]
+        
+
+
 
        
         
