@@ -40,3 +40,18 @@ def test_create_author():
 
     conn.close()
 
+
+def test_create_noor():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    setup_db(cursor)
+
+    author = Author(name="Noor")
+    author.create_author(cursor)
+    conn.commit()
+
+    assert author.id is not None
+    assert author.name == "Noor"
+
+    conn.close()
+

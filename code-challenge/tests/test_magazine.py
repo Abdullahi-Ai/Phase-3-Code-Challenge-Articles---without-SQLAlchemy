@@ -50,5 +50,20 @@ def test_magazine():
 
     conn.close()
 
+def test_create_another_magazine():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    setup_db(cursor)
+
+    mag = Magazine(name="Health Weekly", category="Health")
+    mag.create_magazine(cursor)
+    conn.commit()
+
+    assert mag.id is not None
+    assert mag.name == "Health Weekly"
+    assert mag.category == "Health"
+
+    conn.close()
+
 if __name__ == "__main__":
     test_magazine()
