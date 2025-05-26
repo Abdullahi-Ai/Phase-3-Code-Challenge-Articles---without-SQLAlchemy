@@ -94,5 +94,20 @@ def test_articles_for_magazine_empty():
 
     conn.close()
 
+def test_contributors_for_magazine_empty():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    setup_db(cursor)
+
+    mag = Magazine(name="No Contributors", category="Misc")
+    mag.create_magazine(cursor)
+    conn.commit()
+
+    contributors = mag.contributors(cursor)
+    assert contributors == []
+
+    conn.close()
+
+
 if __name__ == "__main__":
     test_magazine()

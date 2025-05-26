@@ -89,6 +89,21 @@ def test_articles_for_osman_empty():
 
     conn.close()
 
+def test_magazines_for_noor_empty():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    setup_db(cursor)
+
+    author = Author(name="Noor")
+    author.create_author(cursor)
+    conn.commit()
+
+    magazines = author.magazines(cursor)
+    assert magazines == []
+
+    conn.close()
+
+
 
 if __name__ == "__main__":
     test_create_author()

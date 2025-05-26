@@ -89,4 +89,16 @@ def test_articles_for_osman_empty():
 
     conn.close()
 
+def test_multiple_authors_count():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    setup_db(cursor)
+
+    names = ["Osman", "Noor", "Osman", "Noor"]
+    for name in names:
+        author = Author(name=name)
+        author.create_author(cursor)
+
+    conn.commit()
+
 
