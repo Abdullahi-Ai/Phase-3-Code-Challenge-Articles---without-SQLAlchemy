@@ -26,3 +26,13 @@ class Magazine:
 @property
 def category(self):
         return self._category
+
+@category.setter
+def category(self, value):
+        if not isinstance(value, str):
+            raise TypeError("Category must be a string.")
+        if len(value.strip()) == 0:
+            raise ValueError("Category must not be empty.")
+        if hasattr(self, '_category') and self._category is not None:
+            raise AttributeError("Category cannot be changed after instantiation.")
+        self._category = value
