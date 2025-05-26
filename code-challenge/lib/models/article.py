@@ -40,4 +40,15 @@ class Author:
         """Get all articles for this author."""
         cursor.execute("SELECT * FROM articles WHERE author_id = ?", (self._id,))
         return cursor.fetchall()
+    
+    def magazines(self, cursor):
+        """Get all magazines linked to this author's articles."""
+        cursor.execute("""
+            SELECT DISTINCT magazines.*
+            FROM magazines
+            JOIN articles ON magazines.id = articles.magazine_id
+            WHERE articles.author_id = ?
+        """, (self._id,))
+        return cursor.fetchall()
+        
 
