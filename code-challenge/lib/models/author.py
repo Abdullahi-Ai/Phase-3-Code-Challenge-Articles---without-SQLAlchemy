@@ -22,6 +22,12 @@ class Author:
             raise AttributeError("Name cannot be changed after instantiation.")
             self._name = value
 
+            def create_author(self, cursor):
+             """Insert a new author into the database."""
+             cursor.execute("INSERT INTO authors (name) VALUES (?)", (self._name,))
+            self._id = cursor.lastrowid
+
+
        
         
 
