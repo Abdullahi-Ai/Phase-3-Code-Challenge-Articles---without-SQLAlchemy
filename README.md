@@ -40,6 +40,8 @@ add_article(magazine, title): Adds a new article for this author under the speci
 
 topic_areas(): Lists distinct categories or genres of magazines the author has written for.
 
+Article magazine and author it's in the models file
+
 ## For the Magazine class:
 
 articles(): Retrieves all articles published in the magazine.
