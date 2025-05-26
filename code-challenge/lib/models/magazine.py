@@ -51,3 +51,15 @@ class Magazine:
     def articles(self, cursor):
       cursor.execute("SELECT * FROM articles WHERE magazine_id = ?", (self._id,))
       return cursor.fetchall()
+    
+
+    
+    def contributors(self, cursor):
+        cursor.execute("""
+            SELECT DISTINCT authors.*
+            FROM authors
+            JOIN articles ON authors.id = articles.author_id
+            WHERE articles.magazine_id = ?
+        """, (self._id,))
+        return cursor.fetchall()
+
