@@ -54,4 +54,39 @@ def test_create_noor():
     assert author.name == "Noor"
 
     conn.close()
+def test_get_all_authors_with_osman_and_noor():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    setup_db(cursor)
+
+    author1 = Author(name="Osman")
+    author1.create_author(cursor)
+
+    author2 = Author(name="Noor")
+    author2.create_author(cursor)
+
+    conn.commit()
+
+    authors = Author.get_all_authors(cursor)
+    names = [a.name for a in authors]
+
+    assert "Osman" in names
+    assert "Noor" in names
+
+    conn.close()
+
+def test_articles_for_osman_empty():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    setup_db(cursor)
+
+    author = Author(name="Osman")
+    author.create_author(cursor)
+    conn.commit()
+
+    articles = author.articles(cursor)
+    assert articles == []
+
+    conn.close()
+
 
