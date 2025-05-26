@@ -5,3 +5,13 @@ class Magazine:
         self._id = id
         self.name = name
         self.category = category
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def name(self):
+        return self._name
+    
+    
