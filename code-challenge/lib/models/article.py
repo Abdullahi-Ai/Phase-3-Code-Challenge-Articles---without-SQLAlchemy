@@ -23,3 +23,9 @@ class Author:
         if hasattr(self, '_name') and self._name is not None:
             raise AttributeError("Name cannot be changed after instantiation.")
         self._name = value
+
+    
+    def create_magazine(self, cursor):
+        cursor.execute("INSERT INTO magazines (name, category) VALUES (?, ?)", (self._name, self._category))
+        self._id = cursor.lastrowid
+        
