@@ -23,12 +23,13 @@ class Magazine:
         if hasattr(self, '_name') and self._name is not None:
             raise AttributeError("Name cannot be changed after instantiation.")
         self._name = value
-@property
-def category(self):
+
+    @property
+    def category(self):
         return self._category
 
-@category.setter
-def category(self, value):
+    @category.setter
+    def category(self, value):
         if not isinstance(value, str):
             raise TypeError("Category must be a string.")
         if len(value.strip()) == 0:
@@ -36,3 +37,8 @@ def category(self, value):
         if hasattr(self, '_category') and self._category is not None:
             raise AttributeError("Category cannot be changed after instantiation.")
         self._category = value
+
+    def create_magazine(self, cursor):
+        cursor.execute("INSERT INTO magazines (name, category) VALUES (?, ?)", (self._name, self._category))
+        self._id = cursor.lastrowid
+ 
