@@ -1,9 +1,9 @@
-# lib/models/article.py
+
 
 class Author:
     def __init__(self, id=None, name=None):
         self._id = id
-        self.name = name  # triggers setter validation
+        self.name = name  
 
     @property
     def id(self):
