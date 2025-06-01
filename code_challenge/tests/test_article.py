@@ -1,6 +1,10 @@
 ## test_article.py
 import sqlite3
-from lib.models.author import Author 
+from lib.models.author import Author
+from lib.models.article import Author, Article
+
+
+from lib.models.magazine import Magazine
 
 def setup_db(cursor):
     cursor.execute("""

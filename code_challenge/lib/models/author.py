@@ -1,7 +1,7 @@
 class Author:
     def __init__(self, id=None, name=None):
         self._id = id
-        self.name = name 
+        self.name = name  # triggers setter validation
 
     @property
     def id(self):
@@ -35,11 +35,15 @@ class Author:
 
     def articles(self, cursor):
         """Get all articles for this author."""
+        if self._id is None:
+            raise ValueError("Author ID is not set. Cannot fetch articles.")
         cursor.execute("SELECT * FROM articles WHERE author_id = ?", (self._id,))
         return cursor.fetchall()
 
     def magazines(self, cursor):
         """Get all magazines linked to this author's articles."""
+        if self._id is None:
+            raise ValueError("Author ID is not set. Cannot fetch magazines.")
         cursor.execute("""
             SELECT DISTINCT magazines.*
             FROM magazines
@@ -47,3 +51,6 @@ class Author:
             WHERE articles.author_id = ?
         """, (self._id,))
         return cursor.fetchall()
+
+    def __repr__(self):
+        return f"<Author id={self._id} name='{self._name}'>"

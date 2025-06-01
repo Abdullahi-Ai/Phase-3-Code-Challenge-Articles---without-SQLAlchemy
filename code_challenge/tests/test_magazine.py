@@ -1,4 +1,6 @@
 import sqlite3
+from lib.models.author import Author
+
 from lib.models.magazine import Magazine
 
 def setup_db(cursor):

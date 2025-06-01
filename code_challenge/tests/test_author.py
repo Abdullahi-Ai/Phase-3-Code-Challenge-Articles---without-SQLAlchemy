@@ -1,6 +1,6 @@
 import sqlite3
 import pytest
-from code_challenge.lib.models.author import Author
+from lib.models.author import Author 
 
 
 
