@@ -1,56 +1,129 @@
+import sqlite3
+from lib.db.connection import get_connection
+
 class Author:
     def __init__(self, id=None, name=None):
-        self._id = id
-        self.name = name 
+        self.id = id
+        self.name = name
 
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Name must be a string.")
-        if len(value.strip()) == 0:
-            raise ValueError("Name must not be empty.")
-        if hasattr(self, '_name') and self._name is not None:
-            raise AttributeError("Name cannot be changed after instantiation.")
-        self._name = value
-
-    def create_author(self, cursor):
-        """Insert a new author into the database."""
-        cursor.execute("INSERT INTO authors (name) VALUES (?)", (self._name,))
-        self._id = cursor.lastrowid
+    def save(self):
+        conn = get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("INSERT INTO authors (name) VALUES (?)", (self.name,))
+            self.id = cursor.lastrowid
+            conn.commit()
+            print(f"[DEBUG] Saved new author: {self.name} with ID: {self.id}")
+        except sqlite3.IntegrityError:
+            cursor.execute("SELECT id FROM authors WHERE name = ?", (self.name,))
+            row = cursor.fetchone()
+            if row:
+                self.id = row[0]
+                print(f"[DEBUG] Author '{self.name}' already exists with ID: {self.id}")
+            else:
+                raise ValueError(f"Author with name '{self.name}' not found after IntegrityError.")
+        finally:
+            conn.close()
 
     @classmethod
-    def get_all_authors(cls, cursor):
-        """Fetch all authors from the database."""
-        cursor.execute("SELECT * FROM authors")
-        authors_data = cursor.fetchall()
-        return [cls(id=row[0], name=row[1]) for row in authors_data]
+    def find_by_id(cls, author_id):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name FROM authors WHERE id = ?", (author_id,))
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            print(f"[DEBUG] Found author by ID {author_id}: {row}")
+            return cls(id=row[0], name=row[1])
+        print(f"[DEBUG] No author found with ID: {author_id}")
+        return None
+        
+    @classmethod
+    def find_by_name(cls, name):
+        conn = get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT id, name FROM authors WHERE name = ?", (name,))
+            row = cursor.fetchone()
+            if row:
+                print(f"[DEBUG] Found author by name '{name}': {row}")
+                return cls(id=row[0], name=row[1])
+            print(f"[DEBUG] No author found with name: {name}")
+            return None
+        except Exception as e:
+            print(f"[ERROR] Error finding author by name: {e}")
+            return None
+        finally:
+            conn.close()
 
-    def articles(self, cursor):
-        """Get all articles for this author."""
-        if self._id is None:
-            raise ValueError("Author ID is not set. Cannot fetch articles.")
-        cursor.execute("SELECT * FROM articles WHERE author_id = ?", (self._id,))
-        return cursor.fetchall()
+    def articles(self):
+        if not self.id:
+            return []
+        from lib.models.article import Article
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, title, author_id, magazine_id FROM articles WHERE author_id = ?", (self.id,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [Article(id=row[0], title=row[1], author_id=row[2], magazine_id=row[3]) for row in rows]
 
-    def magazines(self, cursor):
-        """Get all magazines linked to this author's articles."""
-        if self._id is None:
-            raise ValueError("Author ID is not set. Cannot fetch magazines.")
+    def magazines(self):
+        if not self.id:
+            return []
+        from lib.models.magazine import Magazine
+        conn = get_connection()
+        cursor = conn.cursor()
         cursor.execute("""
-            SELECT DISTINCT magazines.*
-            FROM magazines
-            JOIN articles ON magazines.id = articles.magazine_id
-            WHERE articles.author_id = ?
-        """, (self._id,))
-        return cursor.fetchall()
+            SELECT DISTINCT m.id, m.name, m.category
+            FROM magazines m
+            JOIN articles a ON m.id = a.magazine_id
+            WHERE a.author_id = ?
+        """, (self.id,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [Magazine(id=row[0], name=row[1], category=row[2]) for row in rows]
 
-    def __repr__(self):
-        return f"<Author id={self._id} name='{self._name}'>"
+    def add_article(self, magazine, title):
+        from lib.models.article import Article
+        if not self.id:
+            raise ValueError("Author must be saved before adding articles.")
+        if not magazine.id:
+            raise ValueError("Magazine must be saved before being used.")
+        article = Article(title=title, author_id=self.id, magazine_id=magazine.id)
+        article.save()
+        return article
+
+    def topic_areas(self):
+        if not self.id:
+            return []
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT DISTINCT m.category
+            FROM magazines m
+            JOIN articles a ON m.id = a.magazine_id
+            WHERE a.author_id = ?
+        """, (self.id,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [row[0] for row in rows]
+
+    @classmethod
+    def top_author(cls):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT a.id, a.name, COUNT(ar.id) as article_count
+            FROM authors a
+            JOIN articles ar ON a.id = ar.author_id
+            GROUP BY a.id
+            ORDER BY article_count DESC
+            LIMIT 1
+        """)
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            print(f"[DEBUG] Top author is: {row}")
+            return cls(id=row[0], name=row[1])
+        print("[DEBUG] No top author found")
+        return None

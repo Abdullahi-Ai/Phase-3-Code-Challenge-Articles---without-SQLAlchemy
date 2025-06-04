@@ -1,10 +1,5 @@
-## test_article.py
 import sqlite3
-from lib.models.author import Author
-from lib.models.article import Author, Article
-
-
-from lib.models.magazine import Magazine
+from lib.models.author import Author 
 
 def setup_db(cursor):
     cursor.execute("""
@@ -23,6 +18,7 @@ def setup_db(cursor):
     CREATE TABLE articles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
+        content TEXT,
         author_id INTEGER NOT NULL,
         magazine_id INTEGER NOT NULL,
         FOREIGN KEY(author_id) REFERENCES authors(id),
@@ -36,7 +32,7 @@ def test_create_author():
     setup_db(cursor)
 
     author = Author(name="Osman")
-    author.create_author(cursor)
+    author.create_author(cursor, conn)
     conn.commit()
 
     assert author.id is not None
@@ -50,7 +46,7 @@ def test_create_noor():
     setup_db(cursor)
 
     author = Author(name="Noor")
-    author.create_author(cursor)
+    author.create_author(cursor, conn)
     conn.commit()
 
     assert author.id is not None
@@ -64,10 +60,10 @@ def test_get_all_authors_with_osman_and_noor():
     setup_db(cursor)
 
     author1 = Author(name="Osman")
-    author1.create_author(cursor)
+    author1.create_author(cursor, conn)
 
     author2 = Author(name="Noor")
-    author2.create_author(cursor)
+    author2.create_author(cursor, conn)
 
     conn.commit()
 
@@ -85,7 +81,7 @@ def test_articles_for_osman_empty():
     setup_db(cursor)
 
     author = Author(name="Osman")
-    author.create_author(cursor)
+    author.create_author(cursor, conn)
     conn.commit()
 
     articles = author.articles(cursor)
@@ -99,7 +95,7 @@ def test_magazines_for_noor_empty():
     setup_db(cursor)
 
     author = Author(name="Noor")
-    author.create_author(cursor)
+    author.create_author(cursor, conn)
     conn.commit()
 
     magazines = author.magazines(cursor)
@@ -107,9 +103,6 @@ def test_magazines_for_noor_empty():
 
     conn.close()
 
-
-
 if __name__ == "__main__":
     test_create_author()
-    print("The test.")
-
+    print("Tests completed.")
